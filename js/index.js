@@ -1,6 +1,6 @@
 $(function() {
 	var play = $('#play');
-	play.on("click", function() {
+	play.on("touchend", function() {
 		if(audio.paused) {
 			audio.play();
 			$(this).html('&#xe644;');
@@ -29,11 +29,11 @@ $(function() {
 		var m = Math.floor(v / 60);
 		return m + ":" + s;
 	}
-
+//歌曲时长
 	$(audio).on('canpaly', function() {
 		duration.html(format(audio.duration));
 	})
-
+//播放进度条
 	$(audio).on('timeupdate', function() {
 		var leftB = vi.width()/2;
 		current.html(format(audio.currentTime));
@@ -79,7 +79,7 @@ $(audio).on("timeupdate",function(){
 	pi.css('left',(progress.width()) * audio.currentTime / audio.duration + leftB)
 })
 
-
+//进度条拖动
 pi.on('touchstart',function(e){
 	var offsetX=e.originalEvent.changedTouches[0].clientX-pi.offset().left;
 	var r=pi.width()/2;
@@ -110,7 +110,7 @@ pi.on("touchend", false);
 $(audio).on("volumechange",function(){
 	vi.css('left',vol.width()*audio.volume-vi.width()/2)
 })
-
+//音量拖动
 vi.on('touchstart',function(e){
 	var offsetX=e.originalEvent.changedTouches[0].clientX-vi.offset().left;
 	var r=vi.width()/2;
@@ -128,23 +128,10 @@ vi.on('touchstart',function(e){
 vi.on('touchend',function(e){
 	var offsetX=e.originalEvent.changedTouches[0].clientX-vi.offset().left;
 });
-//	vi.on("mousedown", function(e) {
-//		var r1 = vi.width() / 2;
-//		var start1 = r1 - e.offsetX;
-//		$(document).on("mousemove", function(e) {
-//			var left1 = e.clientX - vol.position().left + start1;
-//			var c1 = left1 / vol.width();
-//			if(c1 < 0 || c1 > 1) { /*边界问题*/
-//				return;
-//			}
-//			audio.volume = left1 / vol.width();
-//			console.log(audio.volume)
-//		})
-//		return false;
-//	})
-//
-//	vi.on("touchend", false);
 
+
+
+//添加歌曲
 	var currentIndex = 0;
 	var musics = [{
 		name: "gala - young for you",
@@ -215,5 +202,30 @@ vi.on('touchend',function(e){
 		//$(".ways").on("touchend",function(){
 		//	$(".list").css("display","none")
 		//})
+		
+		//增加歌曲
+		$(".juzhong").on("touchend",function(){
+		var a=$(this).attr("data-v");
+		musics.push(JSON.parse(a));
+		render();
+	   })
+	    render();
+	    
+	    //滑动删除
+	    var arr=[];
+	    ul.on("touchstart","li",function  (e) {
+		start=e.originalEvent.changedTouches[0].clientX;
+	})
+	
+	ul.on("touchend","li",function  (e) {
+		var end=e.originalEvent.changedTouches[0].clientX;
+		if(end-start>50){
+			arr.splice($(this).index(),1);
+			localStorage.todos=JSON.stringify(arr);
+			$(this).addClass("active").delay(800).queue(function() {
+			$(this).remove().dequeue();
+			});
+		}
+	})
 })
 	
